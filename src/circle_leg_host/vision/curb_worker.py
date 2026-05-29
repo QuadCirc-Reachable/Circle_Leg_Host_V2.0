@@ -50,6 +50,8 @@ class CurbWorker:
 
         self._reliable_streak = 0
         self._h_filt = 0.0
+        self._hb_last_ms = 0
+        self._hb_frames = 0
 
     def start(self) -> None:
         if self._thread and self._thread.is_alive():
@@ -63,6 +65,14 @@ class CurbWorker:
         if self._thread:
             self._thread.join(timeout=2.0)
         self._close_pipeline()
+
+    def pop_debug_image(self):
+        if self._pipeline is None:
+            return None
+        try:
+            return self._pipeline.pop_debug_image()
+        except Exception:
+            return None
 
     # ---------------- internal ----------------
 
@@ -136,6 +146,23 @@ class CurbWorker:
                 continue
 
             self._publish_normal(pf)
+            self._heartbeat(pf)
+
+    def _heartbeat(self, pf) -> None:
+        self._hb_frames += 1
+        now = _ms()
+        if self._hb_last_ms == 0:
+            self._hb_last_ms = now
+            return
+        if now - self._hb_last_ms >= 2000:
+            fps = self._hb_frames * 1000.0 / max(1, now - self._hb_last_ms)
+            log.info(
+                "[vision] %.1f fps  h=%.3fm dist=%.2fm theta=%.1f deg streak=%d",
+                fps, pf.curb_height_m, (pf.distance_m or 0.0), (pf.theta_deg or 0.0),
+                self._reliable_streak,
+            )
+            self._hb_last_ms = now
+            self._hb_frames = 0
 
     def _publish_normal(self, pf) -> None:
         min_h = self.state.get_min_height_m()

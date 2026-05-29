@@ -152,8 +152,24 @@ def main(argv=None) -> int:
     signal.signal(signal.SIGTERM, _on_sig)
 
     try:
-        while not stop:
-            time.sleep(0.2)
+        if vision_worker and vision_show_window:
+            import cv2  # 在主线程 lazy import; 不开窗口时不涉及
+            cv2.namedWindow("RealSense Color/Depth (Aligned)", cv2.WINDOW_AUTOSIZE)
+            log.info("Vision window opened (press q to quit)")
+            while not stop:
+                img = vision_worker.pop_debug_image()
+                if img is not None:
+                    cv2.imshow("RealSense Color/Depth (Aligned)", img)
+                key = cv2.waitKey(15) & 0xFF
+                if key == ord("q"):
+                    stop = True
+            try:
+                cv2.destroyAllWindows()
+            except Exception:
+                pass
+        else:
+            while not stop:
+                time.sleep(0.2)
     finally:
         log.info("Shutting down...")
         if vision_orch:
