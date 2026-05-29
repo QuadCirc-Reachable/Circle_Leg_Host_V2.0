@@ -1,0 +1,42 @@
+# Circle_Leg_Host_V2.0 默认配置
+# 关闭视觉时整个系统行为等价 Circle_Leg_Host_V1.0
+
+serial:
+  preferred_port: "/dev/ttyACM0"   # 部署时按需修改
+  baudrate: 2000000                # 与 V1.0 / MCU 一致
+  read_timeout: 0.1
+  write_timeout: 0.1
+  reconnect_interval_ms: 2000
+  mcu_idle_timeout_ms: 1000        # MCU 超过该时间无 RX -> 暂停发送
+  mcu_dead_timeout_ms: 8000        # MCU 超过该时间无 RX -> 主动重连
+
+gamepad:
+  enabled: true
+  headless: true                   # true=不弹 UI 窗口
+  output_mode: 1                   # 1=正常 0=按键 ID 调试
+  send_rate_hz: 30
+  deadzone: 0.15
+  # D-pad 在 Linux/xpadneo 上常见为 axis6/7 或 button11-14, 同时探测以保证兼容
+  dpad_axis_x: 6
+  dpad_axis_y: 7
+  dpad_btn_ids:                    # 任一按键检测到即视为按下; -1=禁用
+    UP: 11
+    DOWN: 12
+    LEFT: 13
+    RIGHT: 14
+
+vision:
+  enabled: false                   # 总开关；false 时不 import 任何视觉依赖
+  show_window: false               # true=弹出 OpenCV 调试窗口 (debug 视觉是否正常)
+  control_required: false          # true 时需要 MCU 心跳才会运行
+  default_enabled: true            # 视觉子系统启动后默认是否处于识别状态
+  min_height_mm: 20                # 默认最小台阶阈值 (mm)
+  publish_period_ms: 50            # 0xFC 上报周期 (20Hz)
+  ctrl_timeout_ms: 1500            # 0xFD 心跳超时 -> 自动停识别
+  k_confirm: 3                     # 连续 K 帧确认 detected
+  alpha: 0.3                       # 高度一阶低通系数
+  camera_to_front_edge_m: 0.30
+  realsense_config: "config/realsense.yaml"   # 可选，独立配置文件
+
+ui:
+  enable_pygame_window: false      # gamepad.headless=false 时才会用到
