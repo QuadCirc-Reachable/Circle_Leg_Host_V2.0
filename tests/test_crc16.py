@@ -5,7 +5,9 @@ import struct
 import sys
 
 # 也把 V1.0 加入 path, 直接调用其内部函数做黄金对比
-V1_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "Circle_Leg_Host_V1.0"))
+_V1_CANDIDATES = [os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", name))
+                  for name in ("Circle_Leg_Host_V1.0", "Circle_Leg_Host_V1")]
+V1_DIR = next((d for d in _V1_CANDIDATES if os.path.isfile(os.path.join(d, "main.py"))), _V1_CANDIDATES[0])
 if V1_DIR not in sys.path:
     sys.path.insert(0, V1_DIR)
 
@@ -19,7 +21,7 @@ def _load_v1_main():
     mod = importlib.util.module_from_spec(spec)
     # 通过 exec 只到 wCRC_Table / get_crc16_checksum 定义就足够; 但 main.py 顶层会跑 pygame。
     # 为简便, 直接读取源文件抽取 wCRC_Table 与函数: 这里改为只比对常量与函数。
-    src = open(path, "r").read()
+    src = open(path, "r", encoding="utf-8").read()
     ns = {}
     exec(compile(src, path, "exec"), ns)
     return ns
@@ -34,8 +36,11 @@ from circle_leg_host.protocol.crc16 import (
 
 
 def test_table_matches_v1():
+    import pytest
+    if not os.path.isfile(os.path.join(V1_DIR, "main.py")):
+        pytest.skip("Circle_Leg_Host_V1.0 checkout not found next to this repo")
     # 不执行 V1 全部 main: 仅文本提取
-    src = open(os.path.join(V1_DIR, "main.py"), "r").read()
+    src = open(os.path.join(V1_DIR, "main.py"), "r", encoding="utf-8").read()
     # 简单方法: 让 wCRC_Table 在隔离命名空间被定义
     ns = {}
     start = src.index("wCRC_Table = [")

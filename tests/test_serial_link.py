@@ -1,10 +1,11 @@
 """SerialLink: 打开/关闭/重连行为 (使用 Linux pty 模拟)."""
 
 import os
-import pty
 import time
 
 import pytest
+
+pty = pytest.importorskip("pty", reason="pty (Linux/macOS) required")
 
 from circle_leg_host.comm.router import FrameRouter
 from circle_leg_host.comm.serial_link import SerialLink

@@ -2,10 +2,11 @@
 另一端模拟 MCU: 发 0xFD + 0xFE, 读 0xFC + 0xFF."""
 
 import os
-import pty
 import time
 
 import pytest
+
+pty = pytest.importorskip("pty", reason="pty (Linux/macOS) required")
 
 from circle_leg_host.app.vision_orchestrator import VisionOrchestrator
 from circle_leg_host.comm.router import FrameRouter

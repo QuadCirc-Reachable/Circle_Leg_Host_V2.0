@@ -69,7 +69,7 @@ class CurbPipeline:
 
         if realsense_yaml is None:
             realsense_yaml = os.path.join(_CURBSVM1_DEFAULT, "surfacedetector/config/default.yaml")
-        with open(realsense_yaml, "r") as f:
+        with open(realsense_yaml, "r", encoding="utf-8") as f:
             self._config = yaml.safe_load(f)
 
         # 我们直接调用 get_polygon/analyze_planes, 不走 capture() 主循环,
