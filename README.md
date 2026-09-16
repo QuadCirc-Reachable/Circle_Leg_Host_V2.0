@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="#overview">English</a> | <a href="#项目概述">中文</a>
+  <b>English</b> | <a href="README_zh.md">中文</a>
 </p>
 
 Host-side software for the **REACHABLE (QuadCirc)** CircLeg wheel-leg wheelchair, running on the
@@ -47,29 +47,7 @@ into a tested Python package, and adds a vision link.
 
 ---
 
-## 项目概述
-
-<details>
-<summary>点击展开中文说明</summary>
-
-REACHABLE（QuadCirc）CircLeg 轮腿轮椅的上位机软件，运行在车载 Jetson Orin Nano 上：把操作者的 Xbox 手柄
-实时发送给 STM32 底盘控制器，并可选运行 **RealSense 台阶识别**，把台阶高度 / 距离 / 角度发给 MCU。
-
-2.0 版把单文件的 [Circle_Leg_Host_V1.0](https://github.com/QuadCirc-Reachable/Circle_Leg_Host_V1.0)
-重构为带测试的 Python 包，并新增视觉链路：
-
-- **手柄链路即插即用**：与 V1.0 字节级兼容（`0xFF` 帧、14 字节 `PC_Msg`、双 CRC16、30 Hz）；关闭视觉时行为与 V1.0 完全一致。
-- **共享串口链路**：单串口、单 RX 线程，按协议 ID 线程安全分发；自动选口、每 2 s 重连；MCU 1 s 无数据暂停发送，8 s 强制重连。
-- **可选台阶视觉**：RealSense D435 → `curbsvm1` 平面提取 + SVM 边界 → 台阶高度 / 距离 / 角度 / 置信度；连续 K 帧确认、
-  高度低通滤波，以 `0xFC` 20 Hz 发给 MCU；MCU 可通过 `0xFD` 心跳启停和设阈值。只有开启视觉时才导入视觉依赖。
-- **手柄稳健**：按系统映射、热插拔；Linux 下 D-pad 同时探测 hat / axis / button 三路并自动基线校准。
-- **可配置**：一个 YAML 配置 + 命令行覆盖；Ctrl+C 优雅退出。
-
-</details>
-
----
-
-## Architecture | 架构
+## Architecture
 
 ```
                     config/default.yaml  +  CLI flags  →  app/main.py
@@ -89,7 +67,7 @@ REACHABLE（QuadCirc）CircLeg 轮腿轮椅的上位机软件，运行在车载 
 
 ---
 
-## Getting Started | 快速开始
+## Getting Started
 
 ```bash
 git clone https://github.com/QuadCirc-Reachable/Circle_Leg_Host_V2.0.git
@@ -119,7 +97,7 @@ for serial access.
 | `--vision` / `--no-vision` | Force vision on / off (overrides `vision.enabled`) |
 | `--vision-window` / `--no-vision-window` | Show / hide the vision debug window |
 
-### Vision setup | 视觉环境
+### Vision setup
 
 Vision wraps the team's `curbsvm1` perception package (RealSense point cloud → Polylidar3D plane
 extraction → SVM curb boundary), which is **not part of this repository**:
@@ -132,7 +110,7 @@ extraction → SVM curb boundary), which is **not part of this repository**:
 
 ---
 
-## Configuration | 配置
+## Configuration
 
 `config/default.yaml`:
 
@@ -161,7 +139,7 @@ Optional keys read by the code: `vision.curbsvm1_path` and `vision.realsense_yam
 
 ---
 
-## Communication Protocol | 通信协议
+## Communication Protocol
 
 Every frame: `| SOF 0xAA | LEN | ID | CRC16(header) | payload | CRC16(frame) |`. It is the
 firmware's RosComm framing, identical to V1.0.
@@ -183,7 +161,7 @@ firmware's RosComm framing, identical to V1.0.
 
 ---
 
-## Testing | 测试
+## Testing
 
 ```bash
 python -m pytest tests/ -q
@@ -198,7 +176,7 @@ python -m pytest tests/ -q
 
 ---
 
-## Repository Structure | 目录结构
+## Repository Structure
 
 ```
 Circle_Leg_Host_V2.0/
@@ -223,7 +201,7 @@ Circle_Leg_Host_V2.0/
 
 ---
 
-## Team | 团队
+## Team
 
 REACHABLE (QuadCirc), HKUST FYP SL05a-25: LIU Hualin (embedded control lead), FANG Ruoyun
 (perception & HMI), WU Ziyao (mechanical architecture & communication), XU Jusen (mechanical lead).
